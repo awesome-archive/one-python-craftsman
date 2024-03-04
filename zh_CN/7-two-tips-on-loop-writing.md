@@ -5,7 +5,7 @@
 > 这是 “Python 工匠”系列的第 7 篇文章。[[查看系列所有文章]](https://github.com/piglei/one-python-craftsman)
 
 <div style="text-align: center; color: #999; margin: 14px 0 14px;font-size: 12px;">
-<img src="https://www.zlovezl.cn/static/uploaded/2019/04/lai-man-nung-1205465-unsplash_w1280.jpg" width="100%" />
+<img src="https://www.piglei.com/static/uploaded/2019/04/lai-man-nung-1205465-unsplash_w1280.jpg" width="100%" />
 </div>
 
 循环是一种常用的程序控制结构。我们常说，机器相比人类的最大优点之一，就是机器可以不眠不休的重复做某件事情，但人却不行。而**“循环”**，则是实现让机器不断重复工作的关键概念。
@@ -44,7 +44,7 @@ for i, name in enumerate(names):
 
 不过，判断某段循环代码是否地道，并不仅仅是以知道或不知道某个内置方法作为标准。我们可以从上面的例子挖掘出更深层的东西。
 
-如你所见，Python 的 `for` 循环只有 `for <item> in <iterable>` 这一种结构，而结构里的前半部分 - *赋值给 item* - 没有太多花样可玩。所以后半部分的 **可迭代对象** 是我们唯一能够大做文章的东西。而以 `enumerate()` 函数为代表的*“修饰函数”*，刚好提供了一种思路：**通过修饰可迭代对象来优化循环本身。**
+如你所见，Python 的 `for` 循环只有 `for <item> in <iterable>` 这一种结构，而结构里的前半部分 - *赋值给 item* - 没有太多花样可玩。所以后半部分的 **可迭代对象** 是我们唯一能够大做文章的东西。而以 `enumerate()` 函数为代表的 *“修饰函数”*，刚好提供了一种思路：**通过修饰可迭代对象来优化循环本身。**
 
 这就引出了我的第一个建议。
 
@@ -52,7 +52,7 @@ for i, name in enumerate(names):
 
 使用修饰函数处理可迭代对象，可以在各种方面影响循环代码。而要找到合适的例子来演示这个方法，并不用去太远，内置模块 [itertools](https://docs.python.org/3.6/library/itertools.html) 就是一个绝佳的例子。
 
-简单来说，itertools 是一个包含很多面向可迭代对象的工具函数集。我在之前的系列文章[《容器的门道》](https://www.zlovezl.cn/articles/mastering-container-types/)里提到过它。
+简单来说，itertools 是一个包含很多面向可迭代对象的工具函数集。我在之前的系列文章[《容器的门道》](https://www.piglei.com/articles/mastering-container-types/)里提到过它。
 
 如果要学习 itertools，那么 [Python 官方文档](https://docs.python.org/3.6/library/itertools.html) 是你的首选，里面有非常详细的模块相关资料。但在这篇文章里，侧重点将和官方文档稍有不同。我会通过一些常见的代码场景，来详细解释它是如何改善循环代码的。
 
@@ -72,7 +72,6 @@ def find_twelve(num_list1, num_list2, num_list3):
 ```
 
 对于这种需要嵌套遍历多个对象的多层循环代码，我们可以使用 [product()](https://docs.python.org/3.6/library/itertools.html#itertools.product) 函数来优化它。`product()` 可以接收多个可迭代对象，然后根据它们的笛卡尔积不断生成结果。
-
 
 ```python
 from itertools import product
@@ -248,7 +247,7 @@ def award_active_users_in_last_30days():
 
 在计算机的世界里，我们经常用**“耦合”**这个词来表示事物之间的关联关系。上面的例子中，*“挑选时间”*和*“发送积分”*这两件事情身处同一个循环体内，建立了非常强的耦合关系。
 
-为了更好的进行代码复用，我们需要把函数里的*“挑选时间”*部分从循环体中解耦出来。而我们的老朋友，**“生成器函数”**是进行这项工作的不二之选。
+为了更好的进行代码复用，我们需要把函数里的*“挑选时间”*部分从循环体中解耦出来。而我们的老朋友，**“生成器函数”** 是进行这项工作的不二之选。
 
 ### 使用生成器函数解耦循环体
 
@@ -285,7 +284,7 @@ def award_active_users_in_last_30days_v2():
 
 def notify_nonsleep_users_in_last_30days():
     """发送通知"""
-    for ts_start, ts_end in gen_weekend_ts_range(30, hour_start=3, hour_end=6):
+    for ts_start, ts_end in gen_weekend_ts_ranges(30, hour_start=3, hour_end=6):
         for record in LoginRecord.filter_by_range(ts_start, ts_end):
             notify_user(record.user_id, 'You should sleep more')
 ```
@@ -304,17 +303,18 @@ def notify_nonsleep_users_in_last_30days():
 
 看完文章的你，有没有什么想吐槽的？请留言或者在 [项目 Github Issues](https://github.com/piglei/one-python-craftsman) 告诉我吧。
 
+[>>>下一篇【8.使用装饰器的技巧】](8-tips-on-decorators.md)
+
+[<<<上一篇【6.异常处理的三个好习惯】](6-three-rituals-of-exceptions-handling.md)
+
 ## 附录
 
 - 题图来源: Photo by Lai man nung on Unsplash
-- 更多系列文章地址：https://github.com/piglei/one-python-craftsman
+- 更多系列文章地址：<https://github.com/piglei/one-python-craftsman>
 
 系列其他文章：
 
 - [所有文章索引 [Github]](https://github.com/piglei/one-python-craftsman)
-- [Python 工匠：容器的门道](https://www.zlovezl.cn/articles/mastering-container-types/)
-- [Python 工匠：编写条件分支代码的技巧](https://www.zlovezl.cn/articles/python-else-block-secrets/)
-- [Python 工匠：异常处理的三个好习惯](https://www.zlovezl.cn/articles/three-rituals-of-exceptions-handling/)
-
-
-
+- [Python 工匠：容器的门道](https://www.piglei.com/articles/mastering-container-types/)
+- [Python 工匠：编写条件分支代码的技巧](https://www.piglei.com/articles/python-else-block-secrets/)
+- [Python 工匠：异常处理的三个好习惯](https://www.piglei.com/articles/three-rituals-of-exceptions-handling/)

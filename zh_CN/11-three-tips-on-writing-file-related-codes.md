@@ -1,11 +1,11 @@
-#  Python 工匠：高效操作文件的三个建议
+# Python 工匠：高效操作文件的三个建议
 
 ## 前言
 
 > 这是 “Python 工匠”系列的第 11 篇文章。[[查看系列所有文章]](https://github.com/piglei/one-python-craftsman)
 
 <div style="text-align: center; color: #999; margin: 14px 0 14px;font-size: 12px;">
-<img src="https://www.zlovezl.cn/static/uploaded/2019/06/devon-divine-1348025-unsplash_1280.jpg" width="100%" />
+<img src="https://www.piglei.com/static/uploaded/2019/06/devon-divine-1348025-unsplash_1280.jpg" width="100%" />
 </div>
 
 在这个世界上，人们每天都在用 Python 完成着不同的工作。而文件操作，则是大家最常需要解决的任务之一。使用 Python，你可以轻松为他人生成精美的报表，也可以用短短几行代码快速解析、整理上万份数据文件。
@@ -46,7 +46,7 @@ def unify_ext_with_os_path(path):
 - [`os.path.join(path, filename)`](https://docs.python.org/3/library/os.path.html#os.path.join)：组合需要操作的文件名为绝对路径
 - [`os.rename(...)`](https://docs.python.org/3/library/os.html#os.rename)：重命名某个文件
 
-上面的函数虽然可以完成需求，但说句实话，即使在写了很多年 Python 代码后，我依然觉得：**这些函数不光很难记，而且最终的成品代码也不怎么讨人喜欢。** 
+上面的函数虽然可以完成需求，但说句实话，即使在写了很多年 Python 代码后，我依然觉得：**这些函数不光很难记，而且最终的成品代码也不怎么讨人喜欢。**
 
 ### 使用 pathlib 模块改写代码
 
@@ -192,7 +192,7 @@ def count_nine_v2(fname):
 
 假如我们在讨论的不是 Python，而是其他编程语言。那么可以说上面的代码已经很好了。但是如果你认真分析一下 `count_nine_v2` 函数，你会发现在循环体内部，存在着两个独立的逻辑：**数据生成（read 调用与 chunk 判断）** 与 **数据消费**。而这两个独立逻辑被耦合在了一起。
 
-正如我在[《编写地道循环》](https://www.zlovezl.cn/articles/two-tips-on-loop-writing/)里所提到的，为了提升复用能力，我们可以定义一个新的 `chunked_file_reader` 生成器函数，由它来负责所有与“数据生成”相关的逻辑。这样 `count_nine_v3` 里面的主循环就只需要负责计数即可。
+正如我在[《编写地道循环》](https://www.piglei.com/articles/two-tips-on-loop-writing/)里所提到的，为了提升复用能力，我们可以定义一个新的 `chunked_file_reader` 生成器函数，由它来负责所有与“数据生成”相关的逻辑。这样 `count_nine_v3` 里面的主循环就只需要负责计数即可。
 
 ```python
 def chunked_file_reader(fp, block_size=1024 * 8):
@@ -214,7 +214,7 @@ def count_nine_v3(fname):
     return count
 ```
 
-进行到这一步，代码似乎已经没有优化的空间了，但其实不然。[iter(iterable)](https://docs.python.org/3/library/functions.html#iter) 是一个用来构造迭代器的内建函数，但它还有一个更少人知道的用法。当我们使用 `iter(callable, sentinel)` 的方式调用它时，会返回一个特殊的对象，迭代它将不断产生可调用对象 callable 的调用结果，直到结果为 setinel 时，迭代终止。
+进行到这一步，代码似乎已经没有优化的空间了，但其实不然。[iter(iterable)](https://docs.python.org/3/library/functions.html#iter) 是一个用来构造迭代器的内建函数，但它还有一个更少人知道的用法。当我们使用 `iter(callable, sentinel)` 的方式调用它时，会返回一个特殊的对象，迭代它将不断产生可调用对象 callable 的调用结果，直到结果为 sentinel 时，迭代终止。
 
 ```python
 def chunked_file_reader(file, block_size=1024 * 8):
@@ -258,7 +258,7 @@ print(count_vowels('small_file.txt'))
 2. 为了准备测试用例，我要么提供几个样板文件，要么写一些临时文件
 3. 而文件是否能被正常打开、读取，也成了我们需要测试的边界情况
 
-**如果，你发现你的函数难以编写单元测试，那通常意味着你应该改进它的设计。**上面的函数应该如何改进呢？答案是：*让函数依赖“文件对象”而不是文件路径*。
+**如果，你发现你的函数难以编写单元测试，那通常意味着你应该改进它的设计**。上面的函数应该如何改进呢？答案是：*让函数依赖“文件对象”而不是文件路径*。
 
 修改后的函数代码如下：
 
@@ -280,7 +280,7 @@ with open('small_file.txt') as fp:
     print(count_vowels_v2(fp))
 ```
 
-**这个改动带来的主要变化，在于它提升了函数的适用面。**因为 Python 是“鸭子类型”的，虽然函数需要接受文件对象，但其实我们可以把任何实现了文件协议的 “类文件对象（file-like object）” 传入 `count_vowels_v2` 函数中。
+**这个改动带来的主要变化，在于它提升了函数的适用面**。因为 Python 是“鸭子类型”的，虽然函数需要接受文件对象，但其实我们可以把任何实现了文件协议的 “类文件对象（file-like object）” 传入 `count_vowels_v2` 函数中。
 
 而 Python 中有着非常多“类文件对象”。比如 io 模块内的 [StringIO](https://docs.python.org/3/library/io.html#io.StringIO) 对象就是其中之一。它是一种基于内存的特殊对象，拥有和文件对象几乎一致的接口设计。
 
@@ -372,21 +372,22 @@ def parse(self, source, parser=None):
 
 看完文章的你，有没有什么想吐槽的？请留言或者在 [项目 Github Issues](https://github.com/piglei/one-python-craftsman) 告诉我吧。
 
+[>>>下一篇【12.写好面向对象代码的原则（上）】](12-write-solid-python-codes-part-1.md)
+
+[<<<上一篇【10.做一个精通规则的玩家】](10-a-good-player-know-the-rules.md)
+
 ## 附录
 
 - 题图来源: Photo by Devon Divine on Unsplash
-- 更多系列文章地址：https://github.com/piglei/one-python-craftsman
+- 更多系列文章地址：<https://github.com/piglei/one-python-craftsman>
 
 系列其他文章：
 
 - [所有文章索引 [Github]](https://github.com/piglei/one-python-craftsman)
-- [Python 工匠：编写条件分支代码的技巧](https://www.zlovezl.cn/articles/python-else-block-secrets/)
-- [Python 工匠：异常处理的三个好习惯](https://www.zlovezl.cn/articles/three-rituals-of-exceptions-handling/)
-- [Python 工匠：编写地道循环的两个建议](https://www.zlovezl.cn/articles/two-tips-on-loop-writing/)
-
+- [Python 工匠：编写条件分支代码的技巧](https://www.piglei.com/articles/python-else-block-secrets/)
+- [Python 工匠：异常处理的三个好习惯](https://www.piglei.com/articles/three-rituals-of-exceptions-handling/)
+- [Python 工匠：编写地道循环的两个建议](https://www.piglei.com/articles/two-tips-on-loop-writing/)
 
 ## 注解
 
 1. <a id="annot1"></a>视机器空闲内存的多少，这个过程可能会消耗比 2GB 更多的内存。
-
-
